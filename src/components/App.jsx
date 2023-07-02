@@ -9,10 +9,12 @@ import ContactList from './ContactList';
 import Filter from './Filter';
 import css from './Notification.module.css';
 
+const LS_KEY = 'contacts';
+
 
 const notification = (message) => {
   toast.warn(`🦄 ${message}`, {
-    position: "top-right",
+    position: 'top-right',
     autoClose: 5000,
     hideProgressBar: false,
     closeOnClick: true,
@@ -20,20 +22,28 @@ const notification = (message) => {
     draggable: true,
     progress: undefined,
     className: css.custom,
-    theme: "light",
+    theme: 'light',
   });
 };
 
 class App extends Component {
   state = {
-    contacts: [
-      { id: 'id-1', name: 'Rosie Simpson', number: '459-12-56' },
-      { id: 'id-2', name: 'Hermione Kline', number: '443-89-12' },
-      { id: 'id-3', name: 'Eden Clements', number: '645-17-79' },
-      { id: 'id-4', name: 'Annie Copeland', number: '227-91-26' },
-    ],
+    contacts: [],
     filter: '',
   };
+
+  componentDidUpdate(prevProps, prevState, snapshot) {
+    if (prevState.contacts !== this.state.contacts) {
+      localStorage.setItem(LS_KEY, JSON.stringify(this.state.contacts));
+    }
+  }
+
+  componentDidMount() {
+    const savedContacts = JSON.parse(localStorage.getItem(LS_KEY));
+    if (savedContacts) {
+      this.setState({ contacts: savedContacts });
+    }
+  }
 
   isContactUnique = (newName) => {
     return this.state.contacts.some(({ name }) => name === newName);
